@@ -16,7 +16,10 @@ game_over = False
 
 # Background variables
 background_image = pygame.image.load('./images/background.png')
-background = pygame.transform.scale(background_image, [WIDTH, HEIGHT])
+background_0 = pygame.transform.scale(background_image, [WIDTH, HEIGHT])
+background_0_pos = [0, 0]
+background_1 = pygame.transform.scale(background_image, [WIDTH, HEIGHT])
+background_1_pos = [WIDTH, 0]
 
 # BIRD variables
 BIRD_X = 80
@@ -47,6 +50,7 @@ WINDOW = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.font.init()
 
 # Fonts
+title = pygame.font.SysFont('Arial', 60)
 middle_font = pygame.font.SysFont('Arial', 30)
 
 def create_pipes():
@@ -63,6 +67,20 @@ def create_pipes():
 
 
 pipes = create_pipes()
+
+
+def move_background():
+    global background_0_pos
+    global background_1_pos
+
+    background_0_pos[0] -= 2
+    background_1_pos[0] -= 2
+
+    if (background_0_pos[0] < -WIDTH):
+        background_0_pos[0] = WIDTH
+
+    if (background_1_pos[0] < -WIDTH):
+        background_1_pos[0] = WIDTH
 
 
 def move_pipes():
@@ -116,7 +134,7 @@ def check_colision():
     if 0 <= first_pos[0] <= 140 and 0 <= bird_position[1] <= first_size[1]:
         game_over = True
 
-    if 0 <= first_pos[0] <= 140 and HEIGHT - second_size[1] <= bird_position[1] <= HEIGHT:
+    if 0 <= first_pos[0] <= 140 and HEIGHT - second_size[1] - 50 <= bird_position[1] <= HEIGHT:
         game_over = True
 
 
@@ -156,7 +174,8 @@ def draw_window(score):
     else:
         hold = sprites[10]
 
-    # Distancia
+    # Texts
+    game_over_text = title.render('Game Over', False, [255, 255, 255])
     score_text = middle_font.render(f'Distance: {score//30}', False, [255, 255, 255])
 
     # Pipes
@@ -172,13 +191,36 @@ def draw_window(score):
     second_pipe = pygame.transform.scale(second_pipe, second_pipe_size)
 
     # render itens
-    WINDOW.blit(background, [0, 0])
-    WINDOW.blit(first_pipe, first_pipe_pos)
-    WINDOW.blit(second_pipe, second_pipe_pos)
-    WINDOW.blit(hold, bird_position)
-    WINDOW.blit(score_text, [0, 0])
+    if game_over:
+        WINDOW.blit(background_0, background_0_pos)
+        WINDOW.blit(background_1, background_1_pos)
+        WINDOW.blit(game_over_text, [WIDTH//2 - 165, HEIGHT//2 - 80])
+        WINDOW.blit(score_text, [WIDTH//2 - 90, HEIGHT//2 + 50])
+
+    else:
+        WINDOW.blit(background_0, background_0_pos)
+        WINDOW.blit(background_1, background_1_pos)
+        WINDOW.blit(first_pipe, first_pipe_pos)
+        WINDOW.blit(second_pipe, second_pipe_pos)
+        WINDOW.blit(hold, bird_position)
+        WINDOW.blit(score_text, [0, 0])
 
     pygame.display.update()
+
+
+def restart():
+    global score
+    global bird_position
+    global game_over
+    global pipes
+
+    key_pressed = pygame.key.get_pressed()
+    if game_over and key_pressed[pygame.K_r]:
+        game_over = False
+        score = 0
+        bird_position = [BIRD_X, HEIGHT//2]
+        pipes = create_pipes()
+
 
 
 def game_start():
@@ -203,8 +245,11 @@ def game_start():
             gravity()
 
         if not game_over:
+            move_background()
             move_pipes()
             score += 1
+        else:
+            restart()
 
             
 
