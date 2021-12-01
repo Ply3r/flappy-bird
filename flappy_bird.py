@@ -1,8 +1,6 @@
 import pygame
 from random import randint
 
-from pygame.transform import rotate
-
 # Contants
 WIDTH, HEIGHT = 700, 900
 FPS = 60
@@ -52,6 +50,7 @@ pygame.font.init()
 # Fonts
 title = pygame.font.SysFont('Arial', 60)
 middle_font = pygame.font.SysFont('Arial', 30)
+small_font = pygame.font.SysFont('Arial', 15)
 
 def create_pipes():
     first_pos = [WIDTH - 30, 0]
@@ -177,6 +176,7 @@ def draw_window(score):
     # Texts
     game_over_text = title.render('Game Over', False, [255, 255, 255])
     score_text = middle_font.render(f'Distance: {score//30}', False, [255, 255, 255])
+    restart_text = small_font.render("Press 'R' to restart", False, [255, 255, 255])
 
     # Pipes
     first_pipe_pos = pipes[0]['pos']
@@ -194,8 +194,12 @@ def draw_window(score):
     if game_over:
         WINDOW.blit(background_0, background_0_pos)
         WINDOW.blit(background_1, background_1_pos)
+        WINDOW.blit(first_pipe, first_pipe_pos)
+        WINDOW.blit(second_pipe, second_pipe_pos)
+        WINDOW.blit(hold, bird_position)
         WINDOW.blit(game_over_text, [WIDTH//2 - 165, HEIGHT//2 - 80])
-        WINDOW.blit(score_text, [WIDTH//2 - 90, HEIGHT//2 + 50])
+        WINDOW.blit(score_text, [WIDTH//2 - 90, HEIGHT//2])
+        WINDOW.blit(restart_text, [WIDTH//2 - 80, HEIGHT//2 + 40])
 
     else:
         WINDOW.blit(background_0, background_0_pos)
